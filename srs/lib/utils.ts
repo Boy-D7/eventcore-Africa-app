@@ -35,6 +35,33 @@ export function generateTicketRef(venue: string): string {
   const rand = Math.random().toString(36).substr(2, 4).toUpperCase()
   return `EVT-${short}-${rand}`
 }
+import QRCode from 'qrcode'
+
+// Generate QR code as base64 image string
+export async function generateQRCode(ticketId: string): Promise<string> {
+  const qrData = JSON.stringify({
+    ticketId,
+    platform: 'eventcore-africa',
+    issued: new Date().toISOString(),
+  })
+  return await QRCode.toDataURL(qrData, {
+    width: 300,
+    margin: 2,
+    color: {
+      dark: '#0b1b33',
+      light: '#ffffff',
+    },
+  })
+}
+
+// Decode QR payload at gate
+export function decodeQRPayload(raw: string): { ticketId: string } | null {
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
 
 // Countdown timer e.g "27d 12h 49m"
 export function getCountdown(eventDate: string): string {
