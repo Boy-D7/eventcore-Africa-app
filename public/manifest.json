@@ -1,0 +1,22 @@
+{
+  "name": "EventCore Africa Scanner",
+  "short_name": "ECA Scanner",
+  "description": "Gate scanner for EventCore Africa Limited",
+  "start_url": "/scanner",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1b33",
+  "theme_color": "#0b1b33",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
