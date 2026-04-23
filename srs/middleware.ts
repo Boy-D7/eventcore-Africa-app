@@ -1,25 +1,59 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/', '/home', '/login', '/register', '/api/auth/callback']
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
 
-export function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            )
+            supabaseResponse = NextResponse.next({ request })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
 
-  const isPublic = PUBLIC_ROUTES.some(route =>
-    path.startsWith(route)
-  )
+    await supabase.auth.getUser()
 
-  // Let public routes pass
-  if (isPublic) {
-    return NextResponse.next()
+  } catch (e) {
+    // If Supabase fails don't block the request
+    console.error('Middleware error:', e)
   }
 
-  // 🔥 TEMP: no auth check here (we'll handle inside pages)
-  return NextResponse.next()
+  const path = request.nextUrl.pathname
+
+  const isPublic =
+    path === '/' ||
+    path.startsWith('/home') ||
+    path.startsWith('/login') ||
+    path.startsWith('/register') ||
+    path.startsWith('/api/auth') ||
+    path.startsWith('/_next') ||
+    path.startsWith('/favicon') ||
+    path.startsWith('/logo') ||
+    path.startsWith('/manifest') ||
+    path.startsWith('/sw.js')
+
+  if (isPublic) return supabaseResponse
+
+  return supabaseResponse
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
