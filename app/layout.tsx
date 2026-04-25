@@ -23,13 +23,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <meta name="theme-color" content="#0b1b33" />
-      </head>
-      <body className={inter.className}>
-        {children}
+      <body
+        className={`${inter.className} bg-[#f4f6fb] text-[#0b1b33]`}
+      >
+        {/* App Container (matches your HTML feel) */}
+        <div className="max-w-[480px] md:max-w-[1000px] mx-auto bg-white min-h-screen shadow-sm md:rounded-[36px] md:mt-5">
+          {children}
+        </div>
       </body>
     </html>
   )
